@@ -1,0 +1,26 @@
+name: Keep Render Services Awake
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  ping-services:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Flask ML microservice
+        continue-on-error: true
+        run: |
+          curl -sS -X POST "https://secureshield-backend-suxu.onrender.com/predict" \
+            -H "Content-Type: application/json" \
+            -d '{"url": "http://example.com"}' \
+            --max-time 60 \
+            -o /dev/null -w "Flask service responded: %{http_code}\n"
+
+      - name: Ping Spring Boot backend
+        continue-on-error: true
+        run: |
+          curl -sS "https://secureshield-backend-1.onrender.com" \
+            --max-time 60 \
+            -o /dev/null -w "Spring Boot service responded: %{http_code}\n"
