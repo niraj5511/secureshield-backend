@@ -22,5 +22,9 @@ jobs:
         continue-on-error: true
         run: |
           curl -sS "https://secureshield-backend-1.onrender.com" \
-            --max-time 60 \
-            -o /dev/null -w "Spring Boot service responded: %{http_code}\n"
+            --max-time 100 \
+            -o /dev/null -w "Spring Boot service responded: %{http_code}\n" || true
+          echo "Retrying to confirm it's awake..."
+          curl -sS "https://secureshield-backend-1.onrender.com" \
+            --max-time 30 \
+            -o /dev/null -w "Spring Boot service (retry) responded: %{http_code}\n"
